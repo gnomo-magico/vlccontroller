@@ -3,6 +3,7 @@ package com.vlccontroller;
 import com.vlccontroller.cli.ArgumentBuilder;
 import com.vlccontroller.cli.ArgumentsParser;
 import com.vlccontroller.dto.VLCInstance;
+import com.vlccontroller.exceptions.ArgumentException;
 import com.vlccontroller.vlccontrol.VLCInterface;
 import com.vlccontroller.vlccontrol.impl.VLCHttpInterface;
 import java.io.BufferedReader;
@@ -56,12 +57,12 @@ public class App {
     }
   }
 
-  public static void exit() {
+  private static void exit() {
     logInfo("Bye!");
     System.exit(1);
   }
 
-  public static void getInfo() {
+  private static void getInfo() {
     Optional<VLCInstance> vlcInstance = vlcInterface.getInstanceMetaInformation();
     if (vlcInstance.isPresent()) {
       printVLCInstanceInfo(vlcInstance.get());
@@ -70,35 +71,35 @@ public class App {
     }
   }
 
-  public static void pause() {
+  private static void pause() {
     logInfo(vlcInterface.pauseInstance());
   }
 
-  public static void play() {
+  private static void play() {
     logInfo(vlcInterface.playInstance());
   }
 
-  public static void logError(String message) {
+  private static void logError(String message) {
     System.err.println("@[ERROR]:\t" + message);
   }
 
-  public static void logInfo(String message) {
+  private static void logInfo(String message) {
     System.out.println("@[INFO]:\t" + message);
   }
 
-  public static void printVLCInstanceInfo(final VLCInstance instance) {
+  private static void printVLCInstanceInfo(final VLCInstance instance) {
     logInfo("Info vlc istanza corrente: ");
     System.out.println(instance);
   }
 
-  public static void printUsageAndExit() {
+  private static void printUsageAndExit() {
     logError("USAGE: --password=<pass> [--host=<host:port>]\n"
         + "\t\thost     : rappresenta l'host dove è attiva l'istanza vlc (di default http://localhost:8080);\n"
         + "\t\tpassword : password per accedere all'interfaccia http dell'istanza vlc;");
     System.exit(-1);
   }
 
-  public static void parseArguments(String[] args) {
+  private static void parseArguments(String[] args) {
     ArgumentsParser parser = ArgumentsParser.createArgs(
             ArgumentBuilder
                 .of("password")
@@ -108,12 +109,17 @@ public class App {
                 .optional("http://localhost:8080")
                 .build())
         .parse(args);
-    pass = parser.get("password");
-    host = parser.get("host");
+    try {
+      pass = parser.get("password");
+      host = parser.get("host");
+    } catch (ArgumentException ex) {
+      logError(ex.getMessage());
+      printUsageAndExit();
+    }
+
   }
 
-
-  public static void printWelcomeBanner() {
+  private static void printWelcomeBanner() {
     try (InputStream in = App.class.getClassLoader().getResourceAsStream("banner.txt")) {
       if (in != null) {
         new BufferedReader(new InputStreamReader(in))
@@ -124,7 +130,7 @@ public class App {
     }
   }
 
-  public static void printHelp() {
+  private static void printHelp() {
     logInfo("COMANDI: [PL] play | [PA] pause | [IN] info |  [H] help | [Q] exit :");
   }
 }

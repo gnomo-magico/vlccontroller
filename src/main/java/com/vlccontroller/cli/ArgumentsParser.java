@@ -1,6 +1,8 @@
 package com.vlccontroller.cli;
 
-import exception.ArgumentException;
+
+import com.vlccontroller.exceptions.ArgumentException;
+import com.vlccontroller.exceptions.MalformedArgumentValue;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -33,12 +35,12 @@ public class ArgumentsParser {
   private void setValueArg(String token, Argument arg) {
     String[] tokenSplitted = token.split("=");
     if (tokenSplitted.length != 2) {
-      throw new ArgumentException("Malformed argument value: " + arg.getName());
+      throw new MalformedArgumentValue("Malformed argument value: " + arg.getName());
     }
     arg.setValue(tokenSplitted[1]);
   }
 
-  public String get(String argName) {
+  public String get(String argName) throws ArgumentException {
     Argument arg = argMap.get(argName);
     String value;
     if (arg == null) {

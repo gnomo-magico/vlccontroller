@@ -1,6 +1,6 @@
 package com.vlccontroller.exceptions;
 
-public class ArgumentException extends RuntimeException {
+public class ArgumentException extends Exception {
 
   private static final long serialVersionUID = 4492325233595888383L;
 
