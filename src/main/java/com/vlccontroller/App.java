@@ -1,15 +1,18 @@
 package com.vlccontroller;
 
+import com.vlccontroller.cli.ArgumentBuilder;
+import com.vlccontroller.cli.ArgumentsParser;
 import com.vlccontroller.dto.VLCInstance;
+import com.vlccontroller.vlccontrol.VLCInterface;
+import com.vlccontroller.vlccontrol.impl.VLCHttpInterface;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Optional;
 import java.util.Scanner;
-import com.vlccontroller.vlccontrol.VLCInterface;
-import com.vlccontroller.vlccontrol.impl.VLCHttpInterface;
 
+@SuppressWarnings("all")
 public class App {
 
   private static String host;
@@ -47,18 +50,10 @@ public class App {
       case "h":
         printHelp();
         break;
-      case "cl":
-        clearConsole();
-        break;
       default:
         logError("Comando [" + comando + "] non riconosciuto");
         break;
     }
-  }
-
-  private static void clearConsole() {
-    System.out.print("\033[H\033[2J");
-    System.out.flush();
   }
 
   public static void exit() {
@@ -104,24 +99,17 @@ public class App {
   }
 
   public static void parseArguments(String[] args) {
-    int len;
-    if ((len = args.length) < 1) {
-      printUsageAndExit();
-    }
-    pass = getValueArg(args[0], "--password");
-    if (len > 1) {
-      host = getValueArg(args[1], "--host");
-    } else {
-      host = "http://localhost:8080";
-    }
-  }
-
-  public static String getValueArg(String arg, String keyExpected) {
-    String[] tokens = arg.split("=");
-    if (tokens.length != 2 || !tokens[0].equals(keyExpected)) {
-      printUsageAndExit();
-    }
-    return tokens[1];
+    ArgumentsParser parser = ArgumentsParser.createArgs(
+            ArgumentBuilder
+                .of("password")
+                .build(),
+            ArgumentBuilder
+                .of("host")
+                .optional("http://localhost:8080")
+                .build())
+        .parse(args);
+    pass = parser.get("password");
+    host = parser.get("host");
   }
 
 
@@ -132,12 +120,11 @@ public class App {
             .lines()
             .forEach(System.out::println);
       }
-    } catch (IOException e) {
-      e.printStackTrace();
+    } catch (IOException ignore) {
     }
   }
 
   public static void printHelp() {
-    logInfo("COMANDI: [PL] play | [PA] pause | [IN] info | [CL] clear console | [H] help | [Q] exit :");
+    logInfo("COMANDI: [PL] play | [PA] pause | [IN] info |  [H] help | [Q] exit :");
   }
 }

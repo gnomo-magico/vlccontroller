@@ -1,8 +1,8 @@
 package com.vlccontroller.dto;
 
-import java.util.Optional;
 import com.vlccontroller.utils.TimeParser;
 import com.vlccontroller.utils.VLCVolumeParser;
+import java.util.Optional;
 
 public class VLCInstance {
 

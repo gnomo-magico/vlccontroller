@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.vlccontroller.commons.Command;
 import com.vlccontroller.dto.VLCInstance;
 import com.vlccontroller.exceptions.VLCConnectionException;
+import com.vlccontroller.vlccontrol.VLCInterface;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -13,7 +14,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import com.vlccontroller.vlccontrol.VLCInterface;
 
 public final class VLCHttpInterface implements VLCInterface {
 
@@ -24,7 +24,13 @@ public final class VLCHttpInterface implements VLCInterface {
   private static final String AUTH_TYPE = "Basic ";
   private static final String HTTP_METHOD = "GET";
 
-
+  /**
+   * Crea un'istanza per la connessione con un'interfaccia http esistente di vlc.
+   *
+   * @param host     dell'interfaccia http
+   * @param password dell'interfaccia http
+   * @throws VLCConnectionException se fallisce nel tentativo di connettersi all'interfaccia
+   */
   public VLCHttpInterface(String host, String password) throws VLCConnectionException {
     try {
       HttpURLConnection conn = (HttpURLConnection) new URL(host).openConnection();
@@ -38,6 +44,13 @@ public final class VLCHttpInterface implements VLCInterface {
     }
   }
 
+  /**
+   * Metodo per ottenere l'oggetto di risposta dell'interfaccia http di vlc, contenente le
+   * informazioni sull'istanza corrente
+   *
+   * @return l'optional di VLCInstance
+   * @throws VLCConnectionException se fallisce nel tentativo di connessione
+   */
   @Override
   public Optional<VLCInstance> getInstanceMetaInformation() throws VLCConnectionException {
     return getResponseFromConnection(getVLCHttpConnection(host + META_INFO_PATH));
@@ -48,6 +61,11 @@ public final class VLCHttpInterface implements VLCInterface {
         .getBytes(StandardCharsets.UTF_8));
   }
 
+  /**
+   * Mette in pausa l'istanza corrente di vlc
+   *
+   * @return il messaggio che rappresenta l'esito dell'operazione
+   */
   @Override
   public String pauseInstance() {
     Optional<VLCInstance> vlcInstance = getInstanceMetaInformation();
@@ -64,6 +82,11 @@ public final class VLCHttpInterface implements VLCInterface {
     return "The istance is already paused or stopped";
   }
 
+  /**
+   * Mette in play l'istanza corrente di vlc
+   *
+   * @return il messaggio che rappresenta l'esito dell'operazione
+   */
   @Override
   public String playInstance() {
     Optional<VLCInstance> vlcInstance = getInstanceMetaInformation();
@@ -80,7 +103,13 @@ public final class VLCHttpInterface implements VLCInterface {
     return "The istance is already playing or is stopped";
   }
 
-
+  /**
+   * Metodo che fa da wrapper al getResponseCode di HttpURLConnection per gestire l'eccezione
+   * localmente
+   *
+   * @param conn la connessione da cui leggere il codice di esito della chiamata
+   * @return il codice di risposta o -1 se è stata lanciata un'eccezione
+   */
   private int getResponseCode(HttpURLConnection conn) {
     try {
       int code = conn.getResponseCode();
@@ -105,6 +134,12 @@ public final class VLCHttpInterface implements VLCInterface {
     }
   }
 
+  /**
+   * Metodo per ottenere l'oggetto di risposta dalla chiamata http ad un'istanza vlc
+   *
+   * @param conn connessione http all'istanza vlc
+   * @return l'optional di VLCInstance
+   */
   private Optional<VLCInstance> getResponseFromConnection(HttpURLConnection conn) {
     try {
       String response = new BufferedReader(new InputStreamReader(conn.getInputStream())).lines()
