@@ -1,2 +1,4 @@
 # vlccontroller
-CLI tool per controllare un'istanza di VLC in esecuzione tramite interfaccia http
+
+![](docs/bckg.png)
+CLI tool per controllare un'istanza di _VLC_ in esecuzione tramite interfaccia _HTTP_.
