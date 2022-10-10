@@ -13,6 +13,7 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.Optional;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public final class VLCHttpInterface implements VLCInterface {
@@ -68,18 +69,8 @@ public final class VLCHttpInterface implements VLCInterface {
    */
   @Override
   public String pauseInstance() {
-    Optional<VLCInstance> vlcInstance = getInstanceMetaInformation();
-    if (vlcInstance.isPresent()) {
-      VLCInstance instance = vlcInstance.get();
-      if (instance.isRunning()) {
-        HttpURLConnection conn = getVLCHttpConnection(
-            host + META_INFO_PATH + "?" + Command.pause());
-        if (200 == getResponseCode(conn)) {
-          return ":paused:";
-        }
-      }
-    }
-    return "The istance is already paused or stopped";
+    return sendCommand(VLCInstance::isRunning, Command.pause(), ":paused:",
+        "The istance is already paused or stopped");
   }
 
   /**
@@ -89,34 +80,35 @@ public final class VLCHttpInterface implements VLCInterface {
    */
   @Override
   public String playInstance() {
-    Optional<VLCInstance> vlcInstance = getInstanceMetaInformation();
-    if (vlcInstance.isPresent()) {
-      VLCInstance instance = vlcInstance.get();
-      if (!instance.isRunning()) {
-        HttpURLConnection conn = getVLCHttpConnection(
-            host + META_INFO_PATH + "?" + Command.play());
-        if (200 == getResponseCode(conn)) {
-          return ":playing:";
-        }
-      }
-    }
-    return "The istance is already playing or is stopped";
+    return sendCommand(i -> !i.isRunning(), Command.play(), ":playing:",
+        "The istance is already playing or is stopped");
   }
 
+  /**
+   * Mette in stop l'istanza corrente di vlc
+   *
+   * @return il messaggio che rappresenta l'esito dell'operazione
+   */
   @Override
   public String stopInstance() {
+    return sendCommand(i -> !i.isStopped(), Command.stop(), ":stopped:",
+        "The istance is already stopped");
+  }
+
+  private String sendCommand(Predicate<VLCInstance> condition, String commmand,
+      String success, String error) {
     Optional<VLCInstance> vlcInstance = getInstanceMetaInformation();
     if (vlcInstance.isPresent()) {
       VLCInstance instance = vlcInstance.get();
-      if (!instance.isStopped()) {
+      if (condition.test(instance)) {
         HttpURLConnection conn = getVLCHttpConnection(
-            host + META_INFO_PATH + "?" + Command.stop());
+            host + META_INFO_PATH + "?" + commmand);
         if (200 == getResponseCode(conn)) {
-          return ":stopped:";
+          return success;
         }
       }
     }
-    return "The istance is already stopped";
+    return error;
   }
 
   /**
