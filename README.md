@@ -20,7 +20,7 @@ Se si intende cambiare la porta in ascolto basta configurarla da impostazioni:
 -  Strumenti > Preferenze > Ingresso/Codificatori;
 - cercare la voce _"Porta http del server"_ e impostare la porta desiderata.
 
-![porta http ](docs\port.png)
+![porta http ](docs/port.png)
 
 ---
 
@@ -41,12 +41,12 @@ La password per comunicare con l'interfaccia va configurato da VLC:
 - Strumenti > Preferenze > Interfaccia > Interfacce Principali > Lua > Http Lua;
 - Inserire la password desiderata.
 
-![](docs\pass.png)
+![](docs/pass.png)
 
 
 #### Esempio esecuzione programma:
 
-![](docs\esempio.png)
+![](docs/esempio.png)
 
 
 ### Pensieri sull'integrazione del codice in HSYCO
