@@ -51,6 +51,9 @@ public class App {
       case "h":
         printHelp();
         break;
+      case "st":
+        stop();
+        break;
       default:
         logError("Comando [" + comando + "] non riconosciuto");
         break;
@@ -77,6 +80,9 @@ public class App {
 
   private static void play() {
     logInfo(vlcInterface.playInstance());
+  }
+  private static void stop() {
+    logInfo(vlcInterface.stopInstance());
   }
 
   private static void logError(String message) {
@@ -131,6 +137,6 @@ public class App {
   }
 
   private static void printHelp() {
-    logInfo("COMANDI: [PL] play | [PA] pause | [IN] info |  [H] help | [Q] exit :");
+    logInfo("COMANDI: [PL] play | [PA] pause | [ST] stop | [IN] info |  [H] help | [Q] exit :");
   }
 }

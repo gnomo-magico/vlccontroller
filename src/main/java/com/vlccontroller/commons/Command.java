@@ -9,6 +9,7 @@ public final class Command {
 
   private static final String PAUSE = "pl_pause";
   private static final String PLAY = "pl_play";
+  private static final String STOP = "pl_stop";
   private static final String COMMAND = "command";
 
   public static String play() {
@@ -17,6 +18,10 @@ public final class Command {
 
   public static String pause() {
     return urlEncoded(PAUSE);
+  }
+
+  public static String stop() {
+    return urlEncoded(STOP);
   }
 
   private static String urlEncoded(final String command) {

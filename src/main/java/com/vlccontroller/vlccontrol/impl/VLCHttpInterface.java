@@ -103,6 +103,22 @@ public final class VLCHttpInterface implements VLCInterface {
     return "The istance is already playing or is stopped";
   }
 
+  @Override
+  public String stopInstance() {
+    Optional<VLCInstance> vlcInstance = getInstanceMetaInformation();
+    if (vlcInstance.isPresent()) {
+      VLCInstance instance = vlcInstance.get();
+      if (!instance.isStopped()) {
+        HttpURLConnection conn = getVLCHttpConnection(
+            host + META_INFO_PATH + "?" + Command.stop());
+        if (200 == getResponseCode(conn)) {
+          return ":stopped:";
+        }
+      }
+    }
+    return "The istance is already stopped";
+  }
+
   /**
    * Metodo che fa da wrapper al getResponseCode di HttpURLConnection per gestire l'eccezione
    * localmente
